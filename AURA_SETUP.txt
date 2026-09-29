@@ -1,0 +1,66 @@
+AURA — NEW VERSION SETUP
+
+1. Replace your existing app.py with this app.py.
+
+2. IMPORTANT MODEL PATH FIX
+Your project structure should be:
+AURA/
+  app.py
+  models/
+    productivity_model.pkl
+    burnout_model.pkl
+  data/
+  src/
+
+The new app.py uses the models folder beside app.py. It no longer looks in D:\\models when app.py is inside your project.
+
+3. FIRST ADMIN LOGIN
+Default administrator username: admin
+Default administrator password: admin123
+
+For a real deployment, change these with environment variables BEFORE starting Streamlit:
+AURA_ADMIN_USERNAME
+AURA_ADMIN_PASSWORD
+AURA_ADMIN_EMAIL
+
+The administrator is the only account allowed into Admin Panel.
+
+4. AUTHENTICATION
+A SQLite database is created automatically at:
+data/aura_auth.db
+Passwords are stored as PBKDF2-SHA256 hashes with per-password salts.
+Login/logout events are recorded for the admin activity history.
+
+5. EMAIL ALERTS (OPTIONAL BUT SUPPORTED)
+Set these environment variables to receive email notifications:
+AURA_ADMIN_EMAIL=your_email@example.com
+AURA_SMTP_HOST=smtp.gmail.com
+AURA_SMTP_PORT=587
+AURA_SMTP_USER=your_email@example.com
+AURA_SMTP_PASSWORD=your_app_password
+
+For Gmail, use a Google App Password rather than your normal Gmail password.
+
+The app sends an email for successful admin login and for a Critical burnout model prediction. If SMTP is not configured, the app still works and keeps activity inside the app.
+
+6. PAGES
+Home
+AURA Analysis (What-If is embedded inside this page)
+Treatment
+History
+About
+Admin Panel (admin only)
+
+7. DAILY TRACKING
+Home includes a daily check-in/calendar-style table. Daily tracking is stored in SQLite separately from ML analysis history.
+
+8. USER PRIVACY
+Regular users can see only their own analysis history.
+Admin can see platform-wide analysis data and login/activity history.
+
+9. MOBILE
+The UI is responsive and designed for browser use on desktop and mobile screens. This is a responsive web app, not a native Android/iOS APK.
+
+10. RUN
+From the project folder:
+streamlit run app.py
