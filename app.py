@@ -5293,7 +5293,7 @@ col1, col2 = st.columns([1, 2])
 
 with col1:
     st.image(
-        "creator.jpg",
+        "My logo.png",
         caption="Anshika",
         width=220
     )
