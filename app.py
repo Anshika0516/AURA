@@ -5281,30 +5281,41 @@ def render_about_page():
         st.markdown("🧪 **What-If Analysis**")
         st.markdown("Scenario-based behavioral simulation.")
 
-    # ========================================================
-    # PROJECT CREATOR
-    # ========================================================
+# ========================================================
+# PROJECT CREATOR
+# ========================================================
 
-    st.divider()
+st.divider()
 
-    st.subheader("👩‍💻 About the Creator")
+st.subheader("👩‍💻 About the Creator")
 
-    st.write(
+col1, col2 = st.columns([1, 2])
+
+with col1:
+    st.image(
+        "creator.jpg",
+        caption="Anshika",
+        width=220
+    )
+
+with col2:
+    st.markdown(
         """
-        **Created by Anshika**
+        ### Anshika
 
-        AURA was developed as a Computer Science project with
-        a focus on Artificial Intelligence, Machine Learning,
-        behavioral analytics and interactive web application
-        development.
+        **Computer Science Engineering Student | AI & Machine Learning Enthusiast**
 
-        The project brings predictive analytics, historical
-        tracking, behavioral insights, What-If simulation and
-        secure account functionality together in one platform.
+        I am a Computer Science Engineering student with an interest
+        in **Artificial Intelligence, Machine Learning, Data Science,
+        Generative AI and Cloud Technologies**.
 
-        The objective of AURA is to transform behavioral data
-        into meaningful information that is easier for users
-        to understand and monitor.
+        I enjoy exploring how technology and data can be used to solve
+        real-world problems and create practical applications.
+
+        **Skills & Interests:**  
+        Python • Data Science • Machine Learning • AI • Generative AI
+        • SQL • Data Analytics • Cloud Technologies
+
         """
     )
 
