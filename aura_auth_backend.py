@@ -275,7 +275,7 @@ def ensure_admin_account():
     init_db()
 
     ADMIN_USERNAME = "ANSHIKA"
-    ADMIN_PASSWORD = "killmyassmunishji"
+    ADMIN_PASSWORD = "SHISH1824"
 
     # --------------------------------------------------------
     # Check whether the owner account already exists
