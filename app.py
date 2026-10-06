@@ -8,6 +8,7 @@ import streamlit as st
 
 from aura_auth_backend import (
     authenticate_user,
+    change_password as backend_change_password,
     create_user as backend_create_user,
     ensure_admin_account,
     get_all_users_dataframe,
@@ -798,6 +799,17 @@ def authenticate(username, password):
     return success, role
 
 
+def change_password(username, current_password, new_password):
+    """
+    Change the password for the currently logged-in user.
+    """
+    return backend_change_password(
+        username,
+        current_password,
+        new_password,
+    )
+
+
 def logout_user():
     st.session_state.authenticated = False
     st.session_state.current_user = None
@@ -1406,7 +1418,14 @@ def render_sidebar():
 
         st.markdown(f"<div style=\"padding:13px 14px;border:1px solid var(--aura-border);border-radius:14px;background:var(--aura-surface-2);margin-bottom:12px;\"><div style=\"font-weight:700;\">👤 {st.session_state.current_user}</div><div style=\"color:var(--aura-muted);font-size:12px;margin-top:3px;\">{'Administrator' if is_admin else 'Active user'}</div></div>", unsafe_allow_html=True)
 
-        pages=["Home","AURA Analysis","Treatment","History","About"]
+        pages = [
+            "Home",
+            "AURA Analysis",
+            "Treatment",
+            "History",
+            "Profile",
+            "About",
+        ]
         if is_admin:
             if st.button("👑 Admin Panel",key="nav_admin_panel",use_container_width=True,type="primary" if st.session_state.page=="Admin Panel" else "secondary"):
                 st.session_state.page="Admin Panel"; st.session_state.whatif_result=None; st.rerun()
@@ -6540,6 +6559,141 @@ def render_admin_dashboard():
 
         st.session_state.page = "Home"
         st.rerun()
+# ============================================================
+# PROFILE / PASSWORD PAGE
+# ============================================================
+
+def render_profile_page():
+
+    st.markdown(
+        """
+        <div class="page-header">
+            <div class="page-header-icon">👤</div>
+            <div>
+                <h1>Profile</h1>
+                <p>
+                    Manage your AURA account and password.
+                </p>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        """
+        <div class="analysis-intro">
+            <div>
+                <strong>🔐 Change Password</strong>
+                <br>
+                <span>
+                    Update your account password securely.
+                </span>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.divider()
+
+    username = st.session_state.get("current_user")
+
+    if not username:
+        st.error("No authenticated user found.")
+        return
+
+    st.markdown("### 👤 Account")
+
+    st.text_input(
+        "Username",
+        value=username,
+        disabled=True,
+        key="profile_username",
+    )
+
+    st.divider()
+
+    st.markdown("### 🔐 Password")
+
+    current_password = st.text_input(
+        "Current Password",
+        type="password",
+        key="change_current_password",
+        placeholder="Enter your current password",
+    )
+
+    new_password = st.text_input(
+        "New Password",
+        type="password",
+        key="change_new_password",
+        placeholder="Minimum 8 characters",
+    )
+
+    confirm_new_password = st.text_input(
+        "Confirm New Password",
+        type="password",
+        key="change_confirm_password",
+        placeholder="Re-enter your new password",
+    )
+
+    st.caption(
+        "Password must contain at least 8 characters."
+    )
+
+    if st.button(
+        "🔐 Change Password",
+        use_container_width=True,
+        type="primary",
+        key="change_password_button",
+    ):
+
+        if not current_password:
+            st.error(
+                "Please enter your current password."
+            )
+
+        elif not new_password:
+            st.error(
+                "Please enter a new password."
+            )
+
+        elif new_password != confirm_new_password:
+            st.error(
+                "New passwords do not match."
+            )
+
+        else:
+            success, message = change_password(
+                username,
+                current_password,
+                new_password,
+            )
+
+            if success:
+                st.success(message)
+
+                # Clear password fields after successful change
+                st.session_state.pop(
+                    "change_current_password",
+                    None,
+                )
+                st.session_state.pop(
+                    "change_new_password",
+                    None,
+                )
+                st.session_state.pop(
+                    "change_confirm_password",
+                    None,
+                )
+
+                st.info(
+                    "Your password has been updated. "
+                    "You can continue using AURA."
+                )
+
+            else:
+                st.error(message)
 
 # ============================================================
 # SIDEBAR
@@ -6580,6 +6734,9 @@ elif st.session_state.page == "History":
 
     render_history_dashboard()
 
+elif st.session_state.page == "Profile":
+
+    render_profile_page()
 
 elif st.session_state.page == "About":
 
