@@ -217,6 +217,63 @@ def authenticate_user(username, password, ip_address="", user_agent=""):
     record_login_event(username, user["role"], ip_address, user_agent)
     return True, user["role"], "Login successful."
 
+def change_password(username, current_password, new_password):
+    """
+    Change the password of the currently authenticated user.
+
+    The current password must be correct before the new password
+    can be stored.
+    """
+    username = _normalize_username(username)
+
+    if not username:
+        return False, "Username is required."
+
+    valid, message = validate_password(new_password)
+    if not valid:
+        return False, message
+
+    user = get_user(username)
+
+    if not user or not user["is_active"]:
+        return False, "User account not found."
+
+    # Verify the existing password first
+    if not _verify_password(
+        current_password,
+        user["password_hash"],
+    ):
+        return False, "Current password is incorrect."
+
+    # Prevent using the same password again
+    if _verify_password(
+        new_password,
+        user["password_hash"],
+    ):
+        return False, "New password must be different from the current password."
+
+    # Generate a completely new salted PBKDF2 hash
+    new_password_hash = _pbkdf2_hash(new_password)
+
+    try:
+        with _connect() as conn:
+            conn.execute(
+                """
+                UPDATE users
+                SET password_hash = ?
+                WHERE id = ?
+                """,
+                (
+                    new_password_hash,
+                    user["id"],
+                ),
+            )
+            conn.commit()
+
+    except sqlite3.Error:
+        return False, "Unable to update password. Please try again."
+
+    return True, "Password changed successfully."
 
 def _insert_migrated_user(username, password_hash, role, created_at):
     if get_user(username):
